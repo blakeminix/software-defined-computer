@@ -37,6 +37,12 @@ impl CPU {
         byte
     }
 
+    pub fn fetch_u16(&mut self) -> u16 {
+        let lo = self.fetch_u8() as u16;
+        let hi = self.fetch_u8() as u16;
+        (hi << 8) | lo
+    }
+
     pub fn step(&mut self) {
         let opcode_byte = self.fetch_u8();
         let opcode = Opcode::from_byte(opcode_byte).expect("Invalid opcode");
@@ -70,6 +76,33 @@ impl CPU {
 
                 self.registers[dest] = result;
                 self.z = result == 0;
+            }
+
+            Opcode::Load => {
+                let dest = self.fetch_u8() as usize;
+                let addr = self.fetch_u16();
+
+                let b0 = self.read_u8(addr) as u32;
+                let b1 = self.read_u8(addr.wrapping_add(1)) as u32;
+                let b2 = self.read_u8(addr.wrapping_add(2)) as u32;
+                let b3 = self.read_u8(addr.wrapping_add(3)) as u32;
+                
+                let value = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+
+                self.registers[dest] = value;
+                self.z = value == 0;
+            }
+
+            Opcode::Store => {
+                let src = self.fetch_u8() as usize;
+                let addr = self.fetch_u16();
+
+                let value = self.registers[src];
+
+                self.write_u8(addr, value as u8);
+                self.write_u8(addr.wrapping_add(1), (value >> 8) as u8);
+                self.write_u8(addr.wrapping_add(2), (value >> 16) as u8);
+                self.write_u8(addr.wrapping_add(3), (value >> 24) as u8);
             }
 
             Opcode::Print => {
