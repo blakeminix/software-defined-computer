@@ -37,6 +37,9 @@ fn estimate_instruction_length(line: &str) -> usize {
         "PRINT" => 2,
         "LOAD" | "STORE" => 4,
         "JMP" | "JZ" | "JNZ" => 3,
+        "CALL" => 3,
+        "RET" => 1,
+        "PUSH" | "POP" => 2,
         "HALT" => 1,
         _ => 0,
     }
@@ -99,6 +102,23 @@ fn encode_instruction(line: &str, labels: &HashMap<String, usize>, output: &mut 
             let addr = parse_address(parts[1], labels);
             output.push((addr & 0xFF) as u8);
             output.push(((addr >> 8) & 0xFF) as u8);
+        }
+        "CALL" => {
+            output.push(0x0A);
+            let addr = parse_address(parts[1], labels);
+            output.push((addr & 0xFF) as u8);
+            output.push(((addr >> 8) & 0xFF) as u8);
+        }
+        "RET" => {
+            output.push(0x0B);
+        }
+        "PUSH" => {
+            output.push(0x0C);
+            output.push(register_code(parts[1]));
+        }
+        "POP" => {
+            output.push(0x0D);
+            output.push(register_code(parts[1]));
         }
         "HALT" => {
             output.push(0xFF);

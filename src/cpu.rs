@@ -43,6 +43,24 @@ impl CPU {
         (hi << 8) | lo
     }
 
+    pub fn push(&mut self, value: i32) {
+        self.sp = self.sp.wrapping_sub(4);
+        self.write_u8(self.sp, (value & 0xFF) as u8);
+        self.write_u8(self.sp + 1, ((value >> 8) & 0xFF) as u8);
+        self.write_u8(self.sp + 2, ((value >> 16) & 0xFF) as u8);
+        self.write_u8(self.sp + 3, ((value >> 24) & 0xFF) as u8);
+    }
+
+    pub fn pop(&mut self) -> i32 {
+        let b0 = self.read_u8(self.sp) as i32;
+        let b1 = self.read_u8(self.sp + 1) as i32;
+        let b2 = self.read_u8(self.sp + 2) as i32;
+        let b3 = self.read_u8(self.sp + 3) as i32;
+
+        self.sp = self.sp.wrapping_add(4);
+        b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
+    }
+
     pub fn step(&mut self) {
         let opcode_byte = self.fetch_u8();
         let opcode = Opcode::from_byte(opcode_byte).expect("Invalid opcode");
@@ -122,6 +140,26 @@ impl CPU {
                 if !self.z {
                     self.pc = addr;
                 }
+            }
+
+            Opcode::Call => {
+                let addr = self.fetch_u16();
+                self.push(self.pc as i32);
+                self.pc = addr;
+            }
+
+            Opcode::Ret => {
+                self.pc = self.pop() as u16;
+            }
+
+            Opcode::Push => {
+                let reg = self.fetch_u8() as usize;
+                self.push(self.registers[reg]);
+            }
+
+            Opcode::Pop => {
+                let reg = self.fetch_u8() as usize;
+                self.registers[reg] = self.pop();
             }
 
             Opcode::Print => {
