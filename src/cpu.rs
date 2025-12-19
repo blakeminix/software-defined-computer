@@ -20,4 +20,18 @@ impl CPU {
             halted: false,
         }
     }
+
+    pub fn read_u8(&self, addr: u16) -> u8 {
+        self.memory[addr as usize]
+    }
+
+    pub fn write_u8(&mut self, addr: u16, value: u8) {
+        self.memory[addr as usize] = value;
+    }
+
+    pub fn fetch_u8(&mut self) -> u8 {
+        let byte = self.read_u8(self.pc);
+        self.pc = self.pc.wrapping_add(1);
+        byte
+    }
 }
