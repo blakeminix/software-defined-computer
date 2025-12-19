@@ -61,6 +61,17 @@ impl CPU {
                 self.z = result == 0;
             }
 
+            Opcode::Sub => {
+                let dest = self.fetch_u8() as usize;
+                let src1 = self.fetch_u8() as usize;
+                let src2 = self.fetch_u8() as usize;
+
+                let result = self.registers[src1].wrapping_sub(self.registers[src2]);
+
+                self.registers[dest] = result;
+                self.z = result == 0;
+            }
+
             Opcode::Print => {
                 let src = self.fetch_u8() as usize;
                 println!("{}", self.registers[src]);
