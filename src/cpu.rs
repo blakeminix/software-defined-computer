@@ -105,6 +105,25 @@ impl CPU {
                 self.write_u8(addr.wrapping_add(3), (value >> 24) as u8);
             }
 
+            Opcode::Jmp => {
+                let addr = self.fetch_u16();
+                self.pc = addr;
+            }
+
+            Opcode::Jz => {
+                let addr = self.fetch_u16();
+                if self.z {
+                    self.pc = addr;
+                }
+            }
+
+            Opcode::Jnz => {
+                let addr = self.fetch_u16();
+                if !self.z {
+                    self.pc = addr;
+                }
+            }
+
             Opcode::Print => {
                 let src = self.fetch_u8() as usize;
                 println!("{}", self.registers[src]);

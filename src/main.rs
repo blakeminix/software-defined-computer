@@ -9,30 +9,35 @@ fn main() {
     let mut cpu = CPU::new();
 
     // Program:
-    // MOV R0, 42
-    // STORE R0, 0x1000
-    // LOAD R1, 0x1000
-    // PRINT R1
+    // MOV R0, 5
+    // MOV R1, 1
+    // LOOP:
+    // PRINT R0
+    // SUB R0, R0, R1
+    // JNZ LOOP
     // HALT
 
-    cpu.memory[0] = 0x03; // MOV
-    cpu.memory[1] = 0;    // R0
-    cpu.memory[2] = 42;
+    cpu.memory[0x0000] = 0x03; // MOV
+    cpu.memory[0x0001] = 0;    // R0
+    cpu.memory[0x0002] = 5;
 
-    cpu.memory[3] = 0x06; // STORE
-    cpu.memory[4] = 0;    // R0
-    cpu.memory[5] = 0x00;
-    cpu.memory[6] = 0x10;
+    cpu.memory[0x0003] = 0x03; // MOV
+    cpu.memory[0x0004] = 1;    // R1
+    cpu.memory[0x0005] = 1;
 
-    cpu.memory[7] = 0x05;   // LOAD
-    cpu.memory[8] = 1;      // R1
-    cpu.memory[9] = 0x00;
-    cpu.memory[10] = 0x10;
+    cpu.memory[0x0006] = 0x04; // PRINT
+    cpu.memory[0x0007] = 0;    // R0
 
-    cpu.memory[11] = 0x04; // PRINT
-    cpu.memory[12] = 1;    // R1
+    cpu.memory[0x0008] = 0x02; // SUB
+    cpu.memory[0x0009] = 0;    // R0
+    cpu.memory[0x000A] = 0;    // R0
+    cpu.memory[0x000B] = 1;    // R1
 
-    cpu.memory[13] = 0xFF; // HALT
+    cpu.memory[0x000C] = 0x09; // JNZ
+    cpu.memory[0x000D] = 0x06;
+    cpu.memory[0x000E] = 0x00;
+
+    cpu.memory[0x000F] = 0xFF; // HALT
 
     while !cpu.halted {
         cpu.step();
