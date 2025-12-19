@@ -3,7 +3,7 @@ use crate::instruction::Opcode;
 pub const MEMORY_SIZE: usize = 65_536; // 64KB
 
 pub struct CPU {
-    pub registers: [u32; 8],        // R0-R7
+    pub registers: [i32; 8],        // R0-R7
     pub pc: u16,                    // Program Counter
     pub sp: u16,                    // Stack Pointer
     pub z: bool,                    // Zero Flag
@@ -50,7 +50,7 @@ impl CPU {
         match opcode {
             Opcode::Mov => {
                 let dest = self.fetch_u8() as usize;
-                let imm = self.fetch_u8() as u32;
+                let imm = self.fetch_u16() as i32;
 
                 self.registers[dest] = imm;
                 self.z = imm == 0;
@@ -82,10 +82,10 @@ impl CPU {
                 let dest = self.fetch_u8() as usize;
                 let addr = self.fetch_u16();
 
-                let b0 = self.read_u8(addr) as u32;
-                let b1 = self.read_u8(addr.wrapping_add(1)) as u32;
-                let b2 = self.read_u8(addr.wrapping_add(2)) as u32;
-                let b3 = self.read_u8(addr.wrapping_add(3)) as u32;
+                let b0 = self.read_u8(addr) as i32;
+                let b1 = self.read_u8(addr.wrapping_add(1)) as i32;
+                let b2 = self.read_u8(addr.wrapping_add(2)) as i32;
+                let b3 = self.read_u8(addr.wrapping_add(3)) as i32;
                 
                 let value = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
 
