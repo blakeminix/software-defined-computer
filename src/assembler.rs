@@ -40,6 +40,8 @@ fn estimate_instruction_length(line: &str) -> usize {
         "CALL" => 3,
         "RET" => 1,
         "PUSH" | "POP" => 2,
+        "LOADR" | "STORER" => 5,
+        "MOVR" => 3,
         "HALT" => 1,
         _ => 0,
     }
@@ -120,6 +122,27 @@ fn encode_instruction(line: &str, labels: &HashMap<String, usize>, output: &mut 
             output.push(0x0D);
             output.push(register_code(parts[1]));
         }
+        "LOADR" => {
+            output.push(0x0E);
+            output.push(register_code(parts[1]));
+            output.push(register_code(parts[2]));
+            let offset = parts[3].parse::<u16>().unwrap();
+            output.push((offset & 0xFF) as u8);
+            output.push(((offset >> 8) & 0xFF) as u8);
+        }
+        "STORER" => {
+            output.push(0x0F);
+            output.push(register_code(parts[1]));
+            output.push(register_code(parts[2]));
+            let offset = parts[3].parse::<u16>().unwrap();
+            output.push((offset & 0xFF) as u8);
+            output.push(((offset >> 8) & 0xFF) as u8);
+        }
+        "MOVR" => {
+            output.push(0x10);
+            output.push(register_code(parts[1]));
+            output.push(register_code(parts[2]));
+        }
         "HALT" => {
             output.push(0xFF);
         }
@@ -151,6 +174,8 @@ fn register_code(reg: &str) -> u8 {
         "R5" => 5,
         "R6" => 6,
         "R7" => 7,
+        "SP" => 8,
+        "FP" => 9,
         _ => panic!("Unknown register: {}", reg),
     }
 }

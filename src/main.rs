@@ -9,14 +9,17 @@ fn main() {
     // println!("Hello, world!");
 
     let source = r#"
-        mov r0, 10
-        call add
-        print r0
+        mov r0, 5
+        push r0
+        call double
+        print r2
         halt
-    add:
-        add r0, r0, r0
+
+    double:
+        loadr r1, FP, 8
+        add r2, r1, r1
         ret
-    "#;
+        "#;
 
     let mut cpu = CPU::new();
     let program = assemble(source);

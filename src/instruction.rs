@@ -12,6 +12,9 @@ pub enum Opcode {
     Ret = 0x0B,
     Push = 0x0C,
     Pop = 0x0D,
+    LoadR = 0x0E,
+    StoreR = 0x0F,
+    MovR = 0x10,
     Halt = 0xFF,
 }
 
@@ -31,6 +34,9 @@ impl Opcode {
             0x0B => Some(Opcode::Ret),
             0x0C => Some(Opcode::Push),
             0x0D => Some(Opcode::Pop),
+            0x0E => Some(Opcode::LoadR),
+            0x0F => Some(Opcode::StoreR),
+            0x10 => Some(Opcode::MovR),
             0xFF => Some(Opcode::Halt),
             _ => None,
         }
